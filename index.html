@@ -7,8 +7,6 @@
 
 <style>
 :root{
-  --bg:#050505;
-  --card:#111111;
   --gold:#ffd700;
   --gold2:#d4af37;
   --text:#f5f5f5;
@@ -312,7 +310,7 @@ ul{
 <div class="card">
 <h2>🏛 About The Club</h2>
 <p><b>And Chess For All Official</b> is a relaxed chess community built for casual play, improvement, events, daily matches, vote chess, and everything Chess.com has to offer.</p>
-<p>This is a place for players of all levels to enjoy the game without gatekeeping, drama, or whatever nonsense the chess goblins are arguing about today.</p>
+<p>All skill levels are welcome. No gatekeeping, no ego circus, just chess and community.</p>
 </div>
 
 <div class="card">
@@ -341,8 +339,8 @@ ul{
 </div>
 
 <div class="card">
-<h2>👥 Live Member Board</h2>
-<div id="memberBoard">Loading members...</div>
+<h2>🆕 Newest Members</h2>
+<div id="memberBoard">Loading newest members...</div>
 </div>
 
 <div class="card">
@@ -409,8 +407,8 @@ Created by @DevilsGambit22<br>
 const CLUB_SLUG = "and-chess-for-all-official";
 
 const API = "https://api.chess.com/pub";
-const MEMBER_LIMIT = 20;
-const TITLED_LIMIT = 20;
+const MEMBER_LIMIT = 3;
+const TITLED_LIMIT = 50;
 const TITLES = ["GM","WGM","IM","WIM","FM","WFM","NM","CM","WCM"];
 const DEFAULT_AVATAR = "https://www.chess.com/bundles/web/images/noavatar_l.84a92436.gif";
 
@@ -475,17 +473,25 @@ async function loadClubMembers(){
   const allTime = data.all_time || [];
 
   const map = new Map();
+
   [...weekly, ...monthly, ...allTime].forEach(member=>{
-    if(member.username) map.set(member.username.toLowerCase(), member);
+    if(member.username){
+      map.set(member.username.toLowerCase(), member);
+    }
   });
 
   const members = Array.from(map.values());
 
+  const newestMembers = [...members]
+    .filter(member=>member.joined)
+    .sort((a,b)=>(b.joined || 0) - (a.joined || 0))
+    .slice(0, MEMBER_LIMIT);
+
   document.getElementById("totalMembers").textContent = members.length;
   document.getElementById("activeMembers").textContent = weekly.length;
 
-  renderMembers(members.slice(0, MEMBER_LIMIT));
-  loadProfiles(members.slice(0, Math.max(MEMBER_LIMIT, TITLED_LIMIT)));
+  renderMembers(newestMembers);
+  loadProfiles(members);
 }
 
 function renderMembers(members){
@@ -493,13 +499,18 @@ function renderMembers(members){
   board.innerHTML = "";
 
   if(!members.length){
-    board.innerHTML = "<p>No members found yet.</p>";
+    board.innerHTML = "<p>No newest members found yet.</p>";
     return;
   }
 
-  members.forEach(m=>{
+  members.forEach((m,index)=>{
     const username = m.username || "Unknown";
     const joined = m.joined ? new Date(m.joined * 1000).toLocaleDateString() : "Unknown";
+
+    let badgeText = "Newest";
+    if(index === 0) badgeText = "Latest";
+    if(index === 1) badgeText = "New";
+    if(index === 2) badgeText = "Recent";
 
     const item = document.createElement("div");
     item.className = "member";
@@ -510,7 +521,7 @@ function renderMembers(members){
         <b><a href="https://www.chess.com/member/${username}" target="_blank">${username}</a></b><br>
         <small>Joined: ${joined}</small>
       </div>
-      <span class="badge">Member</span>
+      <span class="badge">${badgeText}</span>
     `;
     board.appendChild(item);
   });
@@ -519,24 +530,26 @@ function renderMembers(members){
 async function loadProfiles(members){
   const titled = [];
   const board = document.getElementById("titledBoard");
-  board.innerHTML = "Loading profiles...";
+  board.innerHTML = "Checking titled players...";
 
   for(const m of members){
     if(titled.length >= TITLED_LIMIT) break;
 
     const username = m.username;
+    if(!username) continue;
+
     try{
       const profile = await getJSON(`${API}/player/${username}`);
-
-      if(profile.title && TITLES.includes(profile.title)){
-        titled.push(profile);
-      }
-
       const avatar = profile.avatar || DEFAULT_AVATAR;
+
       const memberCard = document.querySelector(`.member[data-user="${username.toLowerCase()}"]`);
       if(memberCard){
         const img = memberCard.querySelector("img");
         img.src = avatar;
+      }
+
+      if(profile.title && TITLES.includes(profile.title)){
+        titled.push(profile);
       }
     }catch(e){}
   }
@@ -550,12 +563,13 @@ function renderTitled(players){
   board.innerHTML = "";
 
   if(!players.length){
-    board.innerHTML = "<p>No titled players found in the checked members yet.</p>";
+    board.innerHTML = "<p>No titled players found yet.</p>";
     return;
   }
 
   players.forEach(p=>{
     const avatar = p.avatar || DEFAULT_AVATAR;
+
     board.innerHTML += `
       <div class="member">
         <img src="${avatar}" alt="${p.username}">
@@ -571,7 +585,7 @@ function renderTitled(players){
 
 loadClubMembers().catch(err=>{
   document.getElementById("memberBoard").innerHTML =
-  "<p>Could not load members. Check the club slug or Chess.com API availability.</p>";
+  "<p>Could not load newest members. Check the club slug or Chess.com API availability.</p>";
   document.getElementById("titledBoard").innerHTML =
   "<p>Could not check titled players.</p>";
   document.getElementById("totalMembers").textContent = "Error";
@@ -583,7 +597,7 @@ loadClubMembers().catch(err=>{
 const tracks = [
   {
     title: "The Forgotten Kingdom",
-    src: "onecinematicstudio-the-forgotten-kingdom-_-melancholic-amp-grand-ancient-ruins-music-529059.mp3"
+    src: "onecinematicstudio-the-forgotten-kingdom--melancholic-amp-grand-ancient-ruins-music-529059.mp3"
   },
   {
     title: "The Last Kingdom",
