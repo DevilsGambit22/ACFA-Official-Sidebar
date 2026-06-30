@@ -15,22 +15,31 @@
 
 *{box-sizing:border-box}
 
-body{
+html,body{
   margin:0;
-  background:radial-gradient(circle at top,#3a2305 0%,#050505 60%,#000 100%);
+  padding:0;
+  width:100%;
+  height:auto;
+  min-height:0;
+  background:transparent;
+  overflow-x:hidden;
   color:var(--text);
   font-family:Arial,sans-serif;
-  overflow-x:hidden;
+}
+
+body{
+  display:block;
 }
 
 .wrap{
   position:relative;
+  width:100%;
   max-width:420px;
-  margin:auto;
+  margin:0 auto;
   padding:12px;
   border:2px solid var(--gold2);
   border-radius:16px;
-  background:rgba(8,8,8,.95);
+  background:radial-gradient(circle at top,#3a2305 0%,#050505 60%,#000 100%);
   box-shadow:0 0 18px var(--gold2);
   overflow:hidden;
 }
@@ -210,10 +219,6 @@ button.secondary{
   margin:10px 0;
 }
 
-.now-playing h3{
-  margin:4px 0 0;
-}
-
 .music-controls{
   display:grid;
   grid-template-columns:1fr 1fr 1fr;
@@ -267,7 +272,7 @@ canvas{
   text-align:center;
   color:#999;
   font-size:11px;
-  margin-top:12px;
+  margin:12px 0 0;
   line-height:1.5;
 }
 
@@ -288,7 +293,6 @@ p{
 <body>
 
 <div class="wrap">
-
 <div class="crownRain" id="crownRain"></div>
 
 <h1>♟ And Chess For All Official</h1>
@@ -382,14 +386,12 @@ Created by @DevilsGambit22<br>
 
 <script>
 const CLUB_SLUG = "and-chess-for-all-official";
-
 const API = "https://api.chess.com/pub";
 const MEMBER_LIMIT = 3;
 const TITLED_LIMIT = 50;
 const TITLES = ["GM","WGM","IM","WIM","FM","WFM","NM","CM","WCM"];
 const DEFAULT_AVATAR = "https://www.chess.com/bundles/web/images/noavatar_l.84a92436.gif";
 
-/* Greeting system */
 const greeting = document.getElementById("timeGreeting");
 const message = document.getElementById("themeMessage");
 
@@ -414,47 +416,36 @@ function updateGreeting(){
 updateGreeting();
 setInterval(updateGreeting,60000);
 
-/* Falling crowns inside sidebar */
 function createCrowns(){
   const crownRain = document.getElementById("crownRain");
-  const crownCount = 24;
-
-  for(let i = 0; i < crownCount; i++){
+  for(let i = 0; i < 24; i++){
     const crown = document.createElement("div");
     crown.className = "crown";
     crown.textContent = "👑";
-
     crown.style.left = Math.random() * 100 + "%";
     crown.style.fontSize = (Math.random() * 12 + 13) + "px";
     crown.style.animationDuration = (Math.random() * 12 + 14) + "s";
     crown.style.animationDelay = (Math.random() * 14) + "s";
-
     crownRain.appendChild(crown);
   }
 }
-
 createCrowns();
 
-/* Chess.com API */
 async function getJSON(url){
-  const res = await fetch(url, {cache:"no-store"});
+  const res = await fetch(url,{cache:"no-store"});
   if(!res.ok) throw new Error("API failed: " + res.status);
   return await res.json();
 }
 
 async function loadClubMembers(){
   const data = await getJSON(`${API}/club/${CLUB_SLUG}/members`);
-
   const weekly = data.weekly || [];
   const monthly = data.monthly || [];
   const allTime = data.all_time || [];
-
   const map = new Map();
 
-  [...weekly, ...monthly, ...allTime].forEach(member=>{
-    if(member.username){
-      map.set(member.username.toLowerCase(), member);
-    }
+  [...weekly,...monthly,...allTime].forEach(member=>{
+    if(member.username) map.set(member.username.toLowerCase(),member);
   });
 
   const members = Array.from(map.values());
@@ -462,7 +453,7 @@ async function loadClubMembers(){
   const newestMembers = [...members]
     .filter(member=>member.joined)
     .sort((a,b)=>(b.joined || 0) - (a.joined || 0))
-    .slice(0, MEMBER_LIMIT);
+    .slice(0,MEMBER_LIMIT);
 
   document.getElementById("totalMembers").textContent = members.length;
   document.getElementById("activeMembers").textContent = weekly.length;
@@ -483,15 +474,11 @@ function renderMembers(members){
   members.forEach((m,index)=>{
     const username = m.username || "Unknown";
     const joined = m.joined ? new Date(m.joined * 1000).toLocaleDateString() : "Unknown";
-
-    let badgeText = "Newest";
-    if(index === 0) badgeText = "Latest";
-    if(index === 1) badgeText = "New";
-    if(index === 2) badgeText = "Recent";
+    const badgeText = index === 0 ? "Latest" : index === 1 ? "New" : "Recent";
 
     const item = document.createElement("div");
     item.className = "member";
-    item.setAttribute("data-user", username.toLowerCase());
+    item.setAttribute("data-user",username.toLowerCase());
     item.innerHTML = `
       <img src="${DEFAULT_AVATAR}" alt="${username}">
       <div>
@@ -506,12 +493,9 @@ function renderMembers(members){
 
 async function loadProfiles(members){
   const titled = [];
-  const board = document.getElementById("titledBoard");
-  board.innerHTML = "Checking titled players...";
 
   for(const m of members){
     if(titled.length >= TITLED_LIMIT) break;
-
     const username = m.username;
     if(!username) continue;
 
@@ -520,10 +504,7 @@ async function loadProfiles(members){
       const avatar = profile.avatar || DEFAULT_AVATAR;
 
       const memberCard = document.querySelector(`.member[data-user="${username.toLowerCase()}"]`);
-      if(memberCard){
-        const img = memberCard.querySelector("img");
-        img.src = avatar;
-      }
+      if(memberCard) memberCard.querySelector("img").src = avatar;
 
       if(profile.title && TITLES.includes(profile.title)){
         titled.push(profile);
@@ -546,7 +527,6 @@ function renderTitled(players){
 
   players.forEach(p=>{
     const avatar = p.avatar || DEFAULT_AVATAR;
-
     board.innerHTML += `
       <div class="member">
         <img src="${avatar}" alt="${p.username}">
@@ -560,25 +540,22 @@ function renderTitled(players){
   });
 }
 
-loadClubMembers().catch(err=>{
-  document.getElementById("memberBoard").innerHTML =
-  "<p>Could not load newest members. Check the club slug or Chess.com API availability.</p>";
-  document.getElementById("titledBoard").innerHTML =
-  "<p>Could not check titled players.</p>";
+loadClubMembers().catch(()=>{
+  document.getElementById("memberBoard").innerHTML = "<p>Could not load newest members.</p>";
+  document.getElementById("titledBoard").innerHTML = "<p>Could not check titled players.</p>";
   document.getElementById("totalMembers").textContent = "Error";
   document.getElementById("activeMembers").textContent = "Error";
   document.getElementById("titledCount").textContent = "Error";
 });
 
-/* ACFA Official Radio Playlist */
 const tracks = [
   {
-    title: "The Forgotten Kingdom",
-    src: "onecinematicstudio-the-forgotten-kingdom-_-melancholic-amp-grand-ancient-ruins-music-529059.mp3"
+    title:"The Forgotten Kingdom",
+    src:"onecinematicstudio-the-forgotten-kingdom-_-melancholic-amp-grand-ancient-ruins-music-529059.mp3"
   },
   {
-    title: "The Last Kingdom",
-    src: "megisss-the-last-kingdom-481576.mp3"
+    title:"The Last Kingdom",
+    src:"megisss-the-last-kingdom-481576.mp3"
   }
 ];
 
@@ -597,16 +574,14 @@ let currentTrack = Number(localStorage.getItem("acfaOfficialCurrentTrack")) || 0
 let shuffleMode = localStorage.getItem("acfaOfficialShuffle") === "true";
 let repeatMode = localStorage.getItem("acfaOfficialRepeat") === "true";
 
-if(currentTrack < 0 || currentTrack >= tracks.length){
-  currentTrack = 0;
-}
+if(currentTrack < 0 || currentTrack >= tracks.length) currentTrack = 0;
 
 function loadTrack(index){
   currentTrack = index;
   music.src = tracks[currentTrack].src;
   trackTitle.textContent = tracks[currentTrack].title;
   musicStatus.textContent = "Selected: " + tracks[currentTrack].title;
-  localStorage.setItem("acfaOfficialCurrentTrack", currentTrack);
+  localStorage.setItem("acfaOfficialCurrentTrack",currentTrack);
 }
 
 function toggleMusic(){
@@ -637,7 +612,6 @@ function nextTrack(){
 
   const wasPlaying = !music.paused;
   loadTrack(currentTrack);
-
   if(wasPlaying){
     music.play();
     musicBtn.textContent = "⏸";
@@ -646,10 +620,8 @@ function nextTrack(){
 
 function prevTrack(){
   currentTrack = (currentTrack - 1 + tracks.length) % tracks.length;
-
   const wasPlaying = !music.paused;
   loadTrack(currentTrack);
-
   if(wasPlaying){
     music.play();
     musicBtn.textContent = "⏸";
@@ -658,14 +630,14 @@ function prevTrack(){
 
 function toggleShuffle(){
   shuffleMode = !shuffleMode;
-  localStorage.setItem("acfaOfficialShuffle", shuffleMode);
-  shuffleBtn.classList.toggle("activeMusicMode", shuffleMode);
+  localStorage.setItem("acfaOfficialShuffle",shuffleMode);
+  shuffleBtn.classList.toggle("activeMusicMode",shuffleMode);
 }
 
 function toggleRepeat(){
   repeatMode = !repeatMode;
-  localStorage.setItem("acfaOfficialRepeat", repeatMode);
-  repeatBtn.classList.toggle("activeMusicMode", repeatMode);
+  localStorage.setItem("acfaOfficialRepeat",repeatMode);
+  repeatBtn.classList.toggle("activeMusicMode",repeatMode);
 }
 
 function stopMusic(){
@@ -679,7 +651,7 @@ function stopMusic(){
 
 function setVolume(value){
   music.volume = Number(value);
-  localStorage.setItem("acfaOfficialMusicVolume", value);
+  localStorage.setItem("acfaOfficialMusicVolume",value);
 }
 
 function formatTime(seconds){
@@ -725,24 +697,22 @@ if(savedVolume !== null){
   music.volume = 0.45;
 }
 
-shuffleBtn.classList.toggle("activeMusicMode", shuffleMode);
-repeatBtn.classList.toggle("activeMusicMode", repeatMode);
-
+shuffleBtn.classList.toggle("activeMusicMode",shuffleMode);
+repeatBtn.classList.toggle("activeMusicMode",repeatMode);
 loadTrack(currentTrack);
 
-/* Celebration effects */
-const canvas=document.getElementById("canvas");
-const ctx=canvas.getContext("2d");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 
 function resize(){
-  canvas.width=window.innerWidth;
-  canvas.height=window.innerHeight;
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 }
 resize();
 window.addEventListener("resize",resize);
 
 function confetti(){
-  let pieces=[];
+  let pieces = [];
   for(let i=0;i<180;i++){
     pieces.push({
       x:Math.random()*canvas.width,
@@ -757,10 +727,10 @@ function confetti(){
 }
 
 function fireworks(){
-  let pieces=[];
+  let pieces = [];
   for(let i=0;i<240;i++){
-    let a=Math.random()*Math.PI*2;
-    let s=Math.random()*7+2;
+    let a = Math.random()*Math.PI*2;
+    let s = Math.random()*7+2;
     pieces.push({
       x:canvas.width/2,
       y:canvas.height/2,
@@ -774,11 +744,11 @@ function fireworks(){
 }
 
 function chessBurst(){
-  let icons=["♔","♕","♖","♗","♘","♙"];
-  let pieces=[];
+  let icons = ["♔","♕","♖","♗","♘","♙"];
+  let pieces = [];
   for(let i=0;i<90;i++){
-    let a=Math.random()*Math.PI*2;
-    let s=Math.random()*6+2;
+    let a = Math.random()*Math.PI*2;
+    let s = Math.random()*6+2;
     pieces.push({
       x:canvas.width/2,
       y:canvas.height/2,
@@ -792,33 +762,37 @@ function chessBurst(){
 }
 
 function animate(pieces,type){
-  let frame=0;
+  let frame = 0;
+
   function draw(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
-    pieces.forEach(p=>{
-      p.x+=p.vx;
-      p.y+=p.vy;
-      p.vy+=.05;
-      p.life--;
-      ctx.globalAlpha=Math.max(p.life/130,0);
 
-      if(type==="icon"){
-        ctx.font="26px Arial";
-        ctx.fillStyle="#ffd700";
+    pieces.forEach(p=>{
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += .05;
+      p.life--;
+      ctx.globalAlpha = Math.max(p.life/130,0);
+
+      if(type === "icon"){
+        ctx.font = "26px Arial";
+        ctx.fillStyle = "#ffd700";
         ctx.fillText(p.icon,p.x,p.y);
       }else{
         ctx.beginPath();
         ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-        ctx.fillStyle=["#ffd700","#d4af37","#fff","#ffcc00"][Math.floor(Math.random()*4)];
+        ctx.fillStyle = ["#ffd700","#d4af37","#fff","#ffcc00"][Math.floor(Math.random()*4)];
         ctx.fill();
       }
     });
 
-    ctx.globalAlpha=1;
+    ctx.globalAlpha = 1;
     frame++;
-    if(frame<180) requestAnimationFrame(draw);
+
+    if(frame < 180) requestAnimationFrame(draw);
     else ctx.clearRect(0,0,canvas.width,canvas.height);
   }
+
   draw();
 }
 </script>
