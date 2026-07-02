@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+html = r'''<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -11,6 +11,8 @@
   --gold2:#d4af37;
   --text:#f5f5f5;
   --muted:#bbbbbb;
+  --dark:#050505;
+  --card:#111111;
 }
 
 *{box-sizing:border-box}
@@ -34,14 +36,28 @@ body{
 .wrap{
   position:relative;
   width:100%;
-  max-width:420px;
-  margin:0 auto;
-  padding:12px;
+  max-width:410px;
+  margin:18px auto;
+  padding:16px;
   border:2px solid var(--gold2);
-  border-radius:16px;
-  background:radial-gradient(circle at top,#3a2305 0%,#050505 60%,#000 100%);
-  box-shadow:0 0 18px var(--gold2);
+  border-radius:28px;
+  background:radial-gradient(circle at top,#3a2305 0%,#050505 58%,#000 100%);
+  box-shadow:
+    0 0 20px rgba(212,175,55,.45),
+    0 16px 35px rgba(0,0,0,.5);
   overflow:hidden;
+  transition:
+    transform .35s ease,
+    box-shadow .35s ease,
+    border-color .35s ease;
+}
+
+.wrap:hover{
+  transform:translateY(-8px) scale(1.015);
+  border-color:var(--gold);
+  box-shadow:
+    0 0 36px rgba(255,215,0,.68),
+    0 24px 50px rgba(0,0,0,.65);
 }
 
 .crownRain{
@@ -58,7 +74,7 @@ body{
   color:var(--gold);
   text-shadow:0 0 10px var(--gold2);
   animation:fallCrown linear infinite;
-  opacity:.65;
+  opacity:.55;
 }
 
 @keyframes fallCrown{
@@ -77,30 +93,54 @@ h1,h2,h3{
   text-shadow:0 0 8px var(--gold2);
 }
 
-h1{font-size:25px;margin:10px 0 8px}
-h2{font-size:20px;margin:0 0 10px}
-h3{font-size:16px;margin:8px 0}
+h1{
+  font-size:25px;
+  margin:10px 0 8px;
+  letter-spacing:.2px;
+}
+
+h2{
+  font-size:19px;
+  margin:0 0 10px;
+}
+
+h3{
+  font-size:16px;
+  margin:8px 0;
+}
 
 .card{
-  background:rgba(17,17,17,.95);
-  border:1px solid var(--gold2);
-  border-radius:12px;
-  padding:12px;
-  margin:12px 0;
-  box-shadow:0 0 10px rgba(212,175,55,.25);
+  background:rgba(17,17,17,.94);
+  border:1px solid rgba(255,215,0,.45);
+  border-radius:22px;
+  padding:14px;
+  margin:14px 0;
+  box-shadow:0 0 12px rgba(212,175,55,.22);
+  backdrop-filter:blur(8px);
+  transition:
+    transform .25s ease,
+    box-shadow .25s ease,
+    border-color .25s ease;
+}
+
+.card:hover{
+  transform:translateY(-4px);
+  border-color:var(--gold);
+  box-shadow:0 0 24px rgba(255,215,0,.42);
 }
 
 .marquee{
   overflow:hidden;
   white-space:nowrap;
   background:#000;
-  border:1px solid var(--gold2);
-  border-radius:10px;
+  border:1px solid rgba(255,215,0,.55);
+  border-radius:18px;
+  box-shadow:inset 0 0 10px rgba(255,215,0,.14);
 }
 
 .marquee span{
   display:inline-block;
-  padding:8px;
+  padding:9px;
   color:var(--gold);
   font-weight:bold;
   animation:scroll 16s linear infinite;
@@ -113,12 +153,18 @@ h3{font-size:16px;margin:8px 0}
 
 .skyBanner{
   text-align:center;
-  padding:12px;
+  padding:14px;
   border:1px solid var(--gold);
-  border-radius:12px;
-  margin:12px 0;
+  border-radius:22px;
+  margin:14px 0;
   background:linear-gradient(135deg,#2b1903,#050505);
-  box-shadow:0 0 12px var(--gold2);
+  box-shadow:0 0 14px rgba(212,175,55,.4);
+  transition:.25s ease;
+}
+
+.skyBanner:hover{
+  transform:translateY(-3px);
+  box-shadow:0 0 24px rgba(255,215,0,.45);
 }
 
 .skyBanner p{
@@ -130,14 +176,24 @@ h3{font-size:16px;margin:8px 0}
 .btn{
   display:block;
   text-align:center;
-  background:var(--gold2);
-  color:#050505;
+  background:linear-gradient(135deg,#ffd700,#d4af37);
+  color:#111;
   text-decoration:none;
   font-weight:bold;
-  padding:10px;
-  border-radius:10px;
+  padding:12px;
+  border-radius:16px;
   margin:8px 0;
-  box-shadow:0 0 10px rgba(255,215,0,.55);
+  box-shadow:0 0 12px rgba(255,215,0,.38);
+  transition:
+    transform .25s ease,
+    box-shadow .25s ease,
+    filter .25s ease;
+}
+
+.btn:hover{
+  transform:scale(1.04);
+  box-shadow:0 0 20px rgba(255,215,0,.65);
+  filter:brightness(1.08);
 }
 
 .btn.dark{
@@ -146,28 +202,30 @@ h3{font-size:16px;margin:8px 0}
   border:1px solid var(--gold2);
 }
 
-.stat{
-  display:flex;
-  justify-content:space-between;
-  border-bottom:1px solid #333;
-  padding:6px 0;
-  gap:8px;
-}
-
 .member{
   display:flex;
   align-items:center;
-  gap:9px;
-  background:#050505;
+  gap:10px;
+  background:#070707;
   border:1px solid #333;
-  border-radius:10px;
-  padding:8px;
+  border-radius:18px;
+  padding:10px;
   margin:8px 0;
+  transition:
+    transform .25s ease,
+    border-color .25s ease,
+    box-shadow .25s ease;
+}
+
+.member:hover{
+  border-color:var(--gold);
+  transform:translateX(4px);
+  box-shadow:0 0 14px rgba(255,215,0,.22);
 }
 
 .member img{
-  width:40px;
-  height:40px;
+  width:42px;
+  height:42px;
   border-radius:50%;
   border:1px solid var(--gold2);
   object-fit:cover;
@@ -180,11 +238,11 @@ h3{font-size:16px;margin:8px 0}
 
 .badge{
   margin-left:auto;
-  background:var(--gold2);
+  background:linear-gradient(135deg,#ffd700,#d4af37);
   color:#050505;
   font-size:11px;
-  padding:4px 7px;
-  border-radius:8px;
+  padding:4px 8px;
+  border-radius:999px;
   font-weight:bold;
   white-space:nowrap;
 }
@@ -193,15 +251,25 @@ small{color:var(--muted)}
 
 button{
   width:100%;
-  padding:10px;
+  padding:11px;
   border:none;
-  border-radius:10px;
-  background:var(--gold2);
-  color:#050505;
+  border-radius:16px;
+  background:linear-gradient(135deg,#ffd700,#d4af37);
+  color:#111;
   font-weight:bold;
-  margin:5px 0;
+  margin:6px 0;
   cursor:pointer;
-  box-shadow:0 0 8px rgba(255,215,0,.35);
+  box-shadow:0 0 10px rgba(255,215,0,.3);
+  transition:
+    transform .25s ease,
+    box-shadow .25s ease,
+    filter .25s ease;
+}
+
+button:hover{
+  transform:scale(1.04);
+  box-shadow:0 0 18px rgba(255,215,0,.65);
+  filter:brightness(1.08);
 }
 
 button.secondary{
@@ -214,9 +282,14 @@ button.secondary{
   text-align:center;
   background:#050505;
   border:1px solid var(--gold2);
-  border-radius:10px;
-  padding:10px;
+  border-radius:18px;
+  padding:12px;
   margin:10px 0;
+  transition:.3s ease;
+}
+
+.now-playing:hover{
+  box-shadow:0 0 18px rgba(255,215,0,.45);
 }
 
 .music-controls{
@@ -284,7 +357,12 @@ p{
 @media(max-width:480px){
   .wrap{
     max-width:100%;
+    margin:0 auto;
     border-radius:0;
+  }
+
+  .wrap:hover{
+    transform:none;
   }
 }
 </style>
@@ -308,15 +386,8 @@ p{
 
 <div class="card">
 <h2>🔗 Quick Links</h2>
-<a class="btn" href="https://discord.gg/YRyhaJEhy" target="_blank">💬 Join Our Discord</a>
+<a class="btn" href="https://discord.gg/Atk2GKfgU" target="_blank">💬 Join Our Discord</a>
 <a class="btn dark" href="https://www.chess.com/variants" target="_blank">♞ Play Variants</a>
-</div>
-
-<div class="card">
-<h2>📊 Live Club Stats</h2>
-<div class="stat"><b>Total Members</b><span id="totalMembers">Loading...</span></div>
-<div class="stat"><b>Recently Active</b><span id="activeMembers">Loading...</span></div>
-<div class="stat"><b>Titled Players</b><span id="titledCount">Loading...</span></div>
 </div>
 
 <div class="card">
@@ -455,9 +526,6 @@ async function loadClubMembers(){
     .sort((a,b)=>(b.joined || 0) - (a.joined || 0))
     .slice(0,MEMBER_LIMIT);
 
-  document.getElementById("totalMembers").textContent = members.length;
-  document.getElementById("activeMembers").textContent = weekly.length;
-
   renderMembers(newestMembers);
   loadProfiles(members);
 }
@@ -512,7 +580,6 @@ async function loadProfiles(members){
     }catch(e){}
   }
 
-  document.getElementById("titledCount").textContent = titled.length;
   renderTitled(titled);
 }
 
@@ -543,9 +610,6 @@ function renderTitled(players){
 loadClubMembers().catch(()=>{
   document.getElementById("memberBoard").innerHTML = "<p>Could not load newest members.</p>";
   document.getElementById("titledBoard").innerHTML = "<p>Could not check titled players.</p>";
-  document.getElementById("totalMembers").textContent = "Error";
-  document.getElementById("activeMembers").textContent = "Error";
-  document.getElementById("titledCount").textContent = "Error";
 });
 
 const tracks = [
@@ -799,3 +863,8 @@ function animate(pieces,type){
 
 </body>
 </html>
+'''
+
+path = Path("/mnt/data/acfa-official-sidebar-no-stats.html")
+path.write_text(html, encoding="utf-8")
+print(f"Created: {path}")
